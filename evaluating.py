@@ -36,8 +36,12 @@ class Metrics(object):
 
         precision_scores = {}
         for tag in self.tagset:
-            precision_scores[tag] = self.correct_tags_number.get(tag, 0) / \
-                self.predict_tags_counter[tag]
+            try:
+                precision_scores[tag] = self.correct_tags_number.get(tag, 0) / \
+                    self.predict_tags_counter[tag]
+            except ZeroDivisionError as err:
+                precision_scores[tag] = 0
+                logger.error(err)
 
         return precision_scores
 
