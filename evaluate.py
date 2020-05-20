@@ -6,7 +6,9 @@ from models.crf import CRFModel
 from models.bilstm_crf import BILSTM_Model
 from utils import save_model, flatten_lists
 from evaluating import Metrics
+from data_operation.function import get_logger
 
+logger = get_logger()
 
 def hmm_train_eval(train_data, test_data, word2id, tag2id, remove_O=False):
     """训练并评估hmm模型"""
@@ -68,8 +70,8 @@ def bilstm_train_and_eval(train_data, dev_data, test_data,
     model_name = "bilstm_crf" if crf else "bilstm"
     save_model(bilstm_model, "./ckpts/"+model_name+".pkl")
 
-    print("训练完毕,共用时{}秒.".format(int(time.time()-start)))
-    print("评估{}模型中...".format(model_name))
+    logger.info("训练完毕,共用时{}秒.".format(int(time.time()-start)))
+    logger.info("评估{}模型中...".format(model_name))
     pred_tag_lists, test_tag_lists = bilstm_model.test(
         test_word_lists, test_tag_lists, word2id, tag2id)
 
@@ -93,7 +95,7 @@ def ensemble_evaluate(results, targets, remove_O=False):
     targets = flatten_lists(targets)
     assert len(pred_tags) == len(targets)
 
-    print("Ensemble 四个模型的结果如下：")
+    logger.info("Ensemble 四个模型的结果如下：")
     metrics = Metrics(targets, pred_tags, remove_O=remove_O)
     metrics.report_scores()
     metrics.report_confusion_matrix()

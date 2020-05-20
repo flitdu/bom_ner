@@ -21,4 +21,4 @@ if __name__ == "__main__":
     logger.info('info test.....')
     logger.error('error test.....')
     logger.critical('critical test.....')
-    print(f'用时：{time.time() - time0}')
+    logger.info(f'用时：{time.time() - time0}')

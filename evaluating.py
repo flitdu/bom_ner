@@ -1,7 +1,9 @@
 from collections import Counter
 
 from utils import flatten_lists
+from data_operation.function import get_logger
 
+logger = get_logger()
 
 class Metrics(object):
     """用于评价模型，计算每个标签的精确率，召回率，F1分数"""
@@ -72,12 +74,12 @@ class Metrics(object):
         # 打印表头
         header_format = '{:>9s}  {:>9} {:>9} {:>9} {:>9}'
         header = ['precision', 'recall', 'f1-score', 'support']
-        print(header_format.format('', *header))
+        logger.info(header_format.format('', *header))
 
         row_format = '{:>9s}  {:>9.4f} {:>9.4f} {:>9.4f} {:>9}'
         # 打印每个标签的 精确率、召回率、f1分数
         for tag in self.tagset:
-            print(row_format.format(
+            logger.info(row_format.format(
                 tag,
                 self.precision_scores[tag],
                 self.recall_scores[tag],
@@ -87,7 +89,7 @@ class Metrics(object):
 
         # 计算并打印平均值
         avg_metrics = self._cal_weighted_average()
-        print(row_format.format(
+        logger.info(row_format.format(
             'avg/total',
             avg_metrics['precision'],
             avg_metrics['recall'],
@@ -138,7 +140,7 @@ class Metrics(object):
 
         self.predict_tags = [tag for i, tag in enumerate(self.predict_tags)
                              if i not in O_tag_indices]
-        print("原总标记数为{}，移除了{}个O标记，占比{:.2f}%".format(
+        logger.info("原总标记数为{}，移除了{}个O标记，占比{:.2f}%".format(
             length,
             len(O_tag_indices),
             len(O_tag_indices) / length * 100
@@ -147,7 +149,7 @@ class Metrics(object):
     def report_confusion_matrix(self):
         """计算混淆矩阵"""
 
-        print("\nConfusion Matrix:")
+        logger.info("\nConfusion Matrix:")
         tag_list = list(self.tagset)
         # 初始化混淆矩阵 matrix[i][j]表示第i个tag被模型预测成第j个tag的次数
         tags_size = len(tag_list)
@@ -166,6 +168,6 @@ class Metrics(object):
 
         # 输出矩阵
         row_format_ = '{:>7} ' * (tags_size+1)
-        print(row_format_.format("", *tag_list))
+        logger.info(row_format_.format("", *tag_list))
         for i, row in enumerate(matrix):
-            print(row_format_.format(tag_list[i], *row))
+            logger.info(row_format_.format(tag_list[i], *row))
