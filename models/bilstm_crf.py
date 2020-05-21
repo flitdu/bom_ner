@@ -9,10 +9,6 @@ from .util import tensorized, sort_by_lengths, cal_loss, cal_lstm_crf_loss
 from .config import TrainingConfig, LSTMConfig
 from .bilstm import BiLSTM
 
-from data_operation.function import get_logger
-
-logger = get_logger()
-
 
 class BILSTM_Model(object):
     def __init__(self, vocab_size, out_size, crf=True):
@@ -74,7 +70,7 @@ class BILSTM_Model(object):
 
                 if self.step % TrainingConfig.print_step == 0:
                     total_step = (len(word_lists) // B + 1)
-                    logger.info("Epoch {}, step/total_step: {}/{} {:.2f}% Loss:{:.4f}".format(
+                    print("Epoch {}, step/total_step: {}/{} {:.2f}% Loss:{:.4f}".format(
                         e, self.step, total_step,
                         100. * self.step / total_step,
                         losses / self.print_step
@@ -84,7 +80,7 @@ class BILSTM_Model(object):
             # 每轮结束测试在验证集上的性能，保存最好的一个
             val_loss = self.validate(
                 dev_word_lists, dev_tag_lists, word2id, tag2id)
-            logger.info("Epoch {}, Val Loss:{:.4f}".format(e, val_loss))
+            print("Epoch {}, Val Loss:{:.4f}".format(e, val_loss))
 
     def train_step(self, batch_sents, batch_tags, word2id, tag2id):
         self.model.train()
@@ -132,7 +128,7 @@ class BILSTM_Model(object):
             val_loss = val_losses / val_step
 
             if val_loss < self._best_val_loss:
-                logger.info("保存模型...")
+                print("保存模型...")
                 self.best_model = deepcopy(self.model)
                 self._best_val_loss = val_loss
 

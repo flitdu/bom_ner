@@ -1,9 +1,7 @@
 from collections import Counter
 
 from utils import flatten_lists
-from data_operation.function import get_logger
 
-logger = get_logger()
 
 class Metrics(object):
     """用于评价模型，计算每个标签的精确率，召回率，F1分数"""
@@ -39,10 +37,8 @@ class Metrics(object):
             try:
                 precision_scores[tag] = self.correct_tags_number.get(tag, 0) / \
                     self.predict_tags_counter[tag]
-            except ZeroDivisionError as err:
+            except ZeroDivisionError:
                 precision_scores[tag] = 0
-                logger.error(err)
-
         return precision_scores
 
     def cal_recall(self):
@@ -78,12 +74,12 @@ class Metrics(object):
         # 打印表头
         header_format = '{:>9s}  {:>9} {:>9} {:>9} {:>9}'
         header = ['precision', 'recall', 'f1-score', 'support']
-        logger.info(header_format.format('', *header))
+        print(header_format.format('', *header))
 
         row_format = '{:>9s}  {:>9.4f} {:>9.4f} {:>9.4f} {:>9}'
         # 打印每个标签的 精确率、召回率、f1分数
         for tag in self.tagset:
-            logger.info(row_format.format(
+            print(row_format.format(
                 tag,
                 self.precision_scores[tag],
                 self.recall_scores[tag],
@@ -93,7 +89,7 @@ class Metrics(object):
 
         # 计算并打印平均值
         avg_metrics = self._cal_weighted_average()
-        logger.info(row_format.format(
+        print(row_format.format(
             'avg/total',
             avg_metrics['precision'],
             avg_metrics['recall'],
@@ -144,7 +140,7 @@ class Metrics(object):
 
         self.predict_tags = [tag for i, tag in enumerate(self.predict_tags)
                              if i not in O_tag_indices]
-        logger.info("原总标记数为{}，移除了{}个O标记，占比{:.2f}%".format(
+        print("原总标记数为{}，移除了{}个O标记，占比{:.2f}%".format(
             length,
             len(O_tag_indices),
             len(O_tag_indices) / length * 100
@@ -153,7 +149,7 @@ class Metrics(object):
     def report_confusion_matrix(self):
         """计算混淆矩阵"""
 
-        logger.info("\nConfusion Matrix:")
+        print("\nConfusion Matrix:")
         tag_list = list(self.tagset)
         # 初始化混淆矩阵 matrix[i][j]表示第i个tag被模型预测成第j个tag的次数
         tags_size = len(tag_list)
@@ -172,6 +168,6 @@ class Metrics(object):
 
         # 输出矩阵
         row_format_ = '{:>7} ' * (tags_size+1)
-        logger.info(row_format_.format("", *tag_list))
+        print(row_format_.format("", *tag_list))
         for i, row in enumerate(matrix):
-            logger.info(row_format_.format(tag_list[i], *row))
+            print(row_format_.format(tag_list[i], *row))
